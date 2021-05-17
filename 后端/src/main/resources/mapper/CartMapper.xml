@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.databasedesign.ecommerce.cart.dao.CartDao">
+
+    <insert id="insertOne" parameterType="com.databasedesign.ecommerce.cart.model.Cart">
+        INSERT INTO `cart`(`customer_id`,`commodity_id`)
+        VALUES (#{customer.studentID},#{commodity.id})
+    </insert>
+
+    <select id="selectByCustomerID" parameterType="string" resultMap="cartResultMap">
+        SELECT
+        CART.id `cart_id`,
+        COMM.id `commodity_id`,
+        COMM.name `commodity_name`,
+        COMM.price `commodity_price`,
+        COMM.express_fee `commodity_express_fee`,
+        COMM.picture `commodity_picture`,
+        S.student_id `seller_id`,
+        S.name `seller_name`
+        FROM `cart` CART
+        INNER JOIN `user` U ON CART.customer_id=U.student_id
+        INNER JOIN `commodity` COMM ON CART.commodity_id=COMM.id
+        INNER JOIN `user` S ON COMM.seller_id=S.student_id
+        WHERE U.student_id=#{customerID}
+    </select>
+
+    <delete id="deleteOne" parameterType="long">
+        DELETE FROM `cart` WHERE `id`=#{cartID}
+    </delete>
+
+    <resultMap id="cartResultMap" type="com.databasedesign.ecommerce.cart.model.Cart">
+        <id property="id" column="cart_id"/>
+        <association property="commodity">
+            <id property="id" column="commodity_id"/>
+            <result property="name" column="commodity_name"/>
+            <result property="price" column="commodity_price"/>
+            <result property="expressFee" column="commodity_express_fee"/>
+            <result property="picture" column="commodity_picture"/>
+            <association property="seller">
+                <id property="studentID" column="seller_id"/>
+                <result property="name" column="seller_name"/>
+            </association>
+        </association>
+    </resultMap>
+
+</mapper>

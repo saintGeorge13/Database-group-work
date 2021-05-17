@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.databasedesign.ecommerce.order.dao.OrderDao">
+
+    <insert id="insertOrder" parameterType="com.databasedesign.ecommerce.order.model.Order">
+        INSERT INTO `order`(`customer_id`,`commodity_id`,`date`)
+        VALUES (#{customer.studentID},#{commodity.id},#{date})
+    </insert>
+
+    <update id="updateReception" parameterType="com.databasedesign.ecommerce.order.model.Order">
+        UPDATE `order` SET `reception`=#{reception}
+        WHERE `id`=#{id} AND `customer_id`=#{customer.studentID}
+    </update>
+
+    <select id="selectByCustomerID" resultMap="orderResultMap">
+        SELECT
+        O.id id,
+        O.date `order_date`,
+        O.reception `order_reception`,
+        Comment.content `comment_content`,
+        Sel.student_id `seller_id`,
+        Sel.name `seller_name`,
+        Commodity.id `commodity_id`,
+        Commodity.name `commodity_name`,
+        Commodity.price `commodity_price`,
+        Commodity.picture `commodity_picture`
+        FROM `order` O
+        LEFT JOIN `user` Cus ON O.customer_id=Cus.student_id
+        LEFT JOIN `commodity` Commodity ON O.commodity_id=Commodity.id
+        LEFT JOIN `user` Sel ON Commodity.seller_id=Sel.student_id
+        LEFT JOIN `comment` Comment ON Comment.order_id=O.id
+        WHERE O.customer_id=#{customerID}
+    </select>
+
+    <select id="checkReception" resultType="_int">
+        SELECT COUNT(*) FROM `order`
+        WHERE `id`=#{id} AND `customer_id`=#{customer.studentID} AND `reception`='是'
+    </select>
+
+    <select id="selectAll" resultMap="orderResultMap">
+        SELECT
+        O.id id,
+        O.date `order_date`,
+        O.reception `order_reception`,
+        Comment.content `comment_content`,
+        Sel.student_id `seller_id`,
+        Sel.name `seller_name`,
+        Commodity.id `commodity_id`,
+        Commodity.name `commodity_name`,
+        Commodity.price `commodity_price`,
+        Commodity.picture `commodity_picture`
+        FROM `order` O
+        LEFT JOIN `user` Cus ON O.customer_id=Cus.student_id
+        LEFT JOIN `commodity` Commodity ON O.commodity_id=Commodity.id
+        LEFT JOIN `user` Sel ON Commodity.seller_id=Sel.student_id
+        LEFT JOIN `comment` Comment ON Comment.order_id=O.id
+    </select>
+
+    <resultMap id="orderResultMap" type="com.databasedesign.ecommerce.order.model.Order">
+        <id property="id" column="id"/>
+        <result property="date" column="order_date"/>
+        <result property="reception" column="order_reception"/>
+        <association property="commodity" >
+            <id property="id" column="commodity_id"/>
+            <result property="name" column="commodity_name"/>
+            <result property="price" column="commodity_price"/>
+            <result property="picture" column="commodity_picture"/>
+            <association property="seller">
+                <id property="studentID" column="seller_id"/>
+                <result property="name" column="seller_name"/>
+            </association>
+        </association>
+        <association property="comment">
+            <result property="content" column="comment_content"/>
+        </association>
+    </resultMap>
+</mapper>

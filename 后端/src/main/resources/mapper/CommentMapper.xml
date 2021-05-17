@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.databasedesign.ecommerce.order.dao.CommentDao">
+
+    <insert id="insertComment" parameterType="com.databasedesign.ecommerce.order.model.Comment">
+        INSERT INTO `comment`(`order_id`,`content`,`star`)
+        VALUES (#{order.id},#{content},#{star})
+    </insert>
+
+    <select id="selectBySellerID" parameterType="string" resultMap="commentResultMap">
+        SELECT
+        CT.id `comment_id`,
+        CT.content `comment_content`,
+        CT.star `comment_star`,
+        CD.id `commodity_id`,
+        CD.name `commodity_name`,
+        C.student_id `customer_id`,
+        C.name `customer_name`,
+        O.date `order_date`
+        FROM `comment` CT
+        INNER JOIN `order` O ON CT.order_id=O.id
+        INNER JOIN `commodity` CD ON O.commodity_id=CD.id
+        INNER JOIN `user` C ON O.customer_id=C.student_id
+        WHERE CD.seller_id=#{sellerID}
+    </select>
+
+    <resultMap id="commentResultMap" type="com.databasedesign.ecommerce.order.model.Comment">
+        <id property="id" column="comment_id"/>
+        <result property="content" column="comment_content"/>
+        <result property="star" column="comment_star"/>
+        <association property="order">
+            <id property="id" column="order_id"/>
+            <result property="date" column="order_date"/>
+            <association property="commodity">
+                <id property="id" column="commodity_id"/>
+                <result property="name" column="commodity_name"/>
+            </association>
+            <association property="customer">
+                <id property="studentID" column="customer_id"/>
+                <result property="name" column="customer_name"/>
+            </association>
+        </association>
+    </resultMap>
+
+</mapper>

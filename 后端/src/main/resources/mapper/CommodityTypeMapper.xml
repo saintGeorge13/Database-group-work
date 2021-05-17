@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.databasedesign.ecommerce.commodity.dao.CommodityTypeDao">
+
+    <select id="selectAllTypes" resultType="string">
+        SELECT `type` FROM `commodity_type`
+    </select>
+
+    <select id="selectCountByType" parameterType="string" resultType="_int">
+        SELECT COUNT(*) FROM `commodity_type` WHERE `type`=#{type}
+    </select>
+
+
+</mapper>

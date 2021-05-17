@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.databasedesign.ecommerce.commodity.dao.CommodityDao">
+
+    <insert id="insertOne" parameterType="com.databasedesign.ecommerce.commodity.model.Commodity"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `commodity`(`seller_id`,`name`,`type`,`price`,`description`,`express_fee`)
+        VALUES (#{seller.studentID},#{name},#{type},#{price},#{description},#{expressFee})
+    </insert>
+
+    <update id="updatePicture">
+        UPDATE `commodity` SET `picture`=#{picture} WHERE `id`=#{id}
+    </update>
+
+    <update id="updateBought" parameterType="long">
+        UPDATE `commodity` SET `bought`='是' WHERE `id`=#{id}
+    </update>
+
+    <select id="selectByRandom" resultMap="commodityResultMap">
+        SELECT
+        C.id `commodity_id`,
+        C.name `commodity_name`,
+        C.type `commodity_type`,
+        C.price `commodity_price`,
+        C.picture `commodity_picture`,
+        U.student_id `seller_id`,
+        U.name `seller_name`
+        FROM `commodity` C
+        LEFT JOIN `user` U ON C.seller_id=U.student_id
+        WHERE `bought`='否'
+        ORDER BY RAND() LIMIT 10
+    </select>
+
+    <select id="selectByKeyword" parameterType="string" resultMap="commodityResultMap">
+        SELECT
+        C.id `commodity_id`,
+        C.name `commodity_name`,
+        C.type `commodity_type`,
+        C.price `commodity_price`,
+        C.picture `commodity_picture`,
+        U.student_id `seller_id`,
+        U.name `seller_name`
+        FROM `commodity` C
+        LEFT JOIN `user` U ON C.seller_id=U.student_id
+        WHERE C.name LIKE CONCAT('%',#{keyword},'%') AND `bought`='否'
+    </select>
+
+    <select id="selectBySellerID" parameterType="string" resultMap="commodityResultMap">
+        SELECT
+        C.id `commodity_id`,
+        C.name `commodity_name`,
+        C.type `commodity_type`,
+        C.price `commodity_price`,
+        C.picture `commodity_picture`,
+        U.student_id `seller_id`,
+        U.name `seller_name`
+        FROM `commodity` C
+        LEFT JOIN `user` U ON C.seller_id=U.student_id
+        WHERE C.seller_id=#{sellerID} AND `bought`='否'
+    </select>
+
+    <select id="selectByID" parameterType="long" resultMap="commodityResultMap">
+        SELECT
+        C.id `commodity_id`,
+        C.name `commodity_name`,
+        C.type `commodity_type`,
+        C.price `commodity_price`,
+        C.picture `commodity_picture`,
+        C.description `commodity_description`,
+        C.express_fee `commodity_express_fee`,
+        U.student_id `seller_id`,
+        U.name `seller_name`
+        FROM `commodity` C
+        LEFT JOIN `user` U ON C.seller_id=U.student_id
+        WHERE C.id=#{id} AND `bought`='否'
+    </select>
+
+    <!--<select id="selectCommentsByID" parameterType="long" resultMap="commentResultMap">-->
+    <!--    SELECT-->
+    <!--    C.id `comment_id`,-->
+    <!--    C.content `comment_content`,-->
+    <!--    C.star `comment_star`,-->
+    <!--    O.id `order_id`,-->
+    <!--    U.student_id `customer_id`,-->
+    <!--    U.name `customer_name`-->
+    <!--    FROM `comment` C-->
+    <!--    INNER JOIN `order` O ON C.order_id=O.id-->
+    <!--    INNER JOIN `user` U ON O.customer_id=U.student_id-->
+    <!--    WHERE O.commodity_id=#{commodityID}-->
+    <!--</select>-->
+
+    <delete id="deleteOne">
+        DELETE FROM `commodity` WHERE `id`=#{commodityID} AND `seller_id`=#{sellerID}
+    </delete>
+
+    <select id="selectAll" resultMap="commodityResultMap">
+        SELECT
+        C.id `commodity_id`,
+        C.name `commodity_name`,
+        C.type `commodity_type`,
+        C.price `commodity_price`,
+        C.picture `commodity_picture`,
+        U.student_id `seller_id`,
+        U.name `seller_name`
+        FROM `commodity` C
+        LEFT JOIN `user` U ON C.seller_id=U.student_id
+        WHERE `bought`='否'
+    </select>
+
+    <delete id="adminDeleteOne" parameterType="_long">
+        DELETE FROM `commodity` WHERE `id`=#{commodityID}
+    </delete>
+
+    <resultMap id="commodityResultMap" type="com.databasedesign.ecommerce.commodity.model.Commodity">
+        <id property="id" column="commodity_id"/>
+        <result property="name" column="commodity_name"/>
+        <result property="type" column="commodity_type"/>
+        <result property="price" column="commodity_price"/>
+        <result property="picture" column="commodity_picture"/>
+        <result property="description" column="commodity_description"/>
+        <result property="expressFee" column="commodity_express_fee"/>
+        <association property="seller">
+            <id property="studentID" column="seller_id"/>
+            <result property="name" column="seller_name"/>
+        </association>
+    </resultMap>
+
+    <!--<resultMap id="commentResultMap" type="com.databasedesign.ecommerce.order.model.Comment">-->
+    <!--    <id property="id" column="comment_id"/>-->
+    <!--    <result property="content" column="comment_content"/>-->
+    <!--    <result property="star" column="comment_star"/>-->
+    <!--    <association property="order">-->
+    <!--        <id property="id" column="order_id"/>-->
+    <!--        <association property="customer">-->
+    <!--            <id property="studentID" column="customer_id"/>-->
+    <!--            <result property="name" column="customer_name"/>-->
+    <!--        </association>-->
+    <!--    </association>-->
+    <!--</resultMap>-->
+
+</mapper>
